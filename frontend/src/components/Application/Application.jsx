@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { PhotoIcon } from "@heroicons/react/24/solid";
 
-export const Application=()=> {
+export const Application = () => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -13,34 +13,44 @@ export const Application=()=> {
     region: "",
     postalCode: "",
     resume: null,
+    coverLetter: null,
   });
 
   const [errors, setErrors] = useState({});
   const [resumeFileName, setResumeFileName] = useState("");
+  const [coverLetterFileName, setCoverLetterFileName] = useState("");
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === "resume") {
+    if (name === "resume" || name === "coverLetter") {
       const file = files[0];
       if (file) {
         if (file.type !== "application/pdf") {
-          setErrors({ ...errors, resume: "Only PDF files are allowed" });
+          setErrors((prevErrors) => ({ ...prevErrors, [name]: "Only PDF files are allowed" }));
         } else if (file.size > 5 * 1024 * 1024) {
-          setErrors({ ...errors, resume: "File size must be less than 5MB" });
+          setErrors((prevErrors) => ({ ...prevErrors, [name]: "File size must be less than 5MB" }));
         } else {
-          setFormData({ ...formData, resume: file });
-          setResumeFileName(file.name);
-          setErrors({ ...errors, resume: "" });
+          setFormData((prevFormData) => ({ ...prevFormData, [name]: file }));
+          if (name === "resume") {
+            setResumeFileName(file.name);
+          } else {
+            setCoverLetterFileName(file.name);
+          }
+          setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
         }
       }
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
     }
   };
 
-  const handleDeleteResume = () => {
-    setFormData({ ...formData, resume: null });
-    setResumeFileName("");
+  const handleDeleteFile = (fileType) => {
+    setFormData((prevFormData) => ({ ...prevFormData, [fileType]: null }));
+    if (fileType === "resume") {
+      setResumeFileName("");
+    } else {
+      setCoverLetterFileName("");
+    }
   };
 
   const handleCancel = () => {
@@ -55,9 +65,11 @@ export const Application=()=> {
       region: "",
       postalCode: "",
       resume: null,
+      coverLetter: null,
     });
     setErrors({});
     setResumeFileName("");
+    setCoverLetterFileName("");
   };
 
   const validateForm = () => {
@@ -83,6 +95,10 @@ export const Application=()=> {
 
     if (!formData.resume) {
       newErrors.resume = "Please upload a resume";
+    }
+
+    if (!formData.coverLetter) {
+      newErrors.coverLetter = "Please upload a cover letter";
     }
 
     setErrors(newErrors);
@@ -266,8 +282,9 @@ export const Application=()=> {
             </div>
           </div>
         </div>
+
         <div className="col-span-full">
-          <label htmlFor="cover-photo" className="block text-sm font-medium leading-6 text-gray-900">
+          <label htmlFor="resume-upload" className="block text-sm font-medium leading-6 text-gray-900">
             Upload Resume
           </label>
           <div
@@ -289,17 +306,17 @@ export const Application=()=> {
               <PhotoIcon aria-hidden="true" className="mx-auto h-12 w-12 text-gray-300" />
               <div className="mt-4 flex text-sm leading-6 text-gray-600">
                 <label
-                  htmlFor="file-upload"
+                  htmlFor="resume-upload"
                   className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
                 >
-                  <span>{resumeFileName || "Upload a file"}</span>
-                  <input id="file-upload" name="resume" type="file" className="sr-only" onChange={handleChange} />
+                  <span>{resumeFileName || "Upload a resume"}</span>
+                  <input id="resume-upload" name="resume" type="file" className="sr-only" onChange={handleChange} />
                 </label>
                 {resumeFileName && (
                   <button
                     type="button"
                     className="ml-4 text-red-600 hover:text-red-800"
-                    onClick={handleDeleteResume}
+                    onClick={() => handleDeleteFile("resume")}
                   >
                     Delete
                   </button>
@@ -310,12 +327,57 @@ export const Application=()=> {
             </div>
           </div>
         </div>
+
+        <div className="col-span-full">
+          <label htmlFor="cover-letter-upload" className="block text-sm font-medium leading-6 text-gray-900">
+            Upload Cover Letter
+          </label>
+          <div
+            className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 mb-10"
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              e.preventDefault();
+              const file = e.dataTransfer.files[0];
+              if (file && file.type === "application/pdf" && file.size <= 5 * 1024 * 1024) {
+                setFormData({ ...formData, coverLetter: file });
+                setCoverLetterFileName(file.name);
+                setErrors({ ...errors, coverLetter: "" });
+              } else {
+                setErrors({ ...errors, coverLetter: "Only PDF files up to 5MB are allowed" });
+              }
+            }}
+          >
+            <div className="text-center">
+              <PhotoIcon aria-hidden="true" className="mx-auto h-12 w-12 text-gray-300" />
+              <div className="mt-4 flex text-sm leading-6 text-gray-600">
+                <label
+                  htmlFor="cover-letter-upload"
+                  className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
+                >
+                  <span>{coverLetterFileName || "Upload a cover letter"}</span>
+                  <input id="cover-letter-upload" name="coverLetter" type="file" className="sr-only" onChange={handleChange} />
+                </label>
+                {coverLetterFileName && (
+                  <button
+                    type="button"
+                    className="ml-4 text-red-600 hover:text-red-800"
+                    onClick={() => handleDeleteFile("coverLetter")}
+                  >
+                    Delete
+                  </button>
+                )}
+              </div>
+              <p className="text-xs leading-5 text-gray-600">PDF up to 5MB</p>
+              {errors.coverLetter && <p className="text-red-600">{errors.coverLetter}</p>}
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="mt-6 flex items-center justify-end gap-x-6">
         <button
           type="button"
-          className="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          className="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
           onClick={handleCancel}
         >
           Cancel
