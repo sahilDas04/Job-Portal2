@@ -98,6 +98,7 @@ export default function Form() {
   };
 
   return (
+<<<<<<< HEAD
     <form onSubmit={handleSubmit}>
       <div className="space-y-12 border px-7 rounded-xl bg-white border-gray-900/10 shadow-2xl">
         <h2 className="py-8 text-center text-3xl font-bold text-black">Job Application</h2>
@@ -121,6 +122,15 @@ export default function Form() {
                 {errors.firstName && <p className="text-red-600">{errors.firstName}</p>}
               </div>
             </div>
+=======
+    <div>
+      <p> arghya chutiya </p>
+      <P> anujit good boy</P>
+      <p>watt lgega </p>
+    </div>
+  )
+}
+>>>>>>> 115e350d3db391d6053301bc2b511594902891f9
 
             <div className="sm:col-span-3">
               <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-gray-900">
