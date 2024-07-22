@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { PhotoIcon } from "@heroicons/react/24/solid";
 
-export default function Application() {
+export default function Form() {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -25,7 +25,7 @@ export default function Application() {
       if (file) {
         if (file.type !== "application/pdf") {
           setErrors({ ...errors, resume: "Only PDF files are allowed" });
-        } else if (file.size > 5 * 1024 * 1024) {
+        } else if (file.size > 5 * 1024 * 1024) { // 5MB in bytes
           setErrors({ ...errors, resume: "File size must be less than 5MB" });
         } else {
           setFormData({ ...formData, resume: file });
@@ -228,6 +228,7 @@ export default function Application() {
                   onChange={handleChange}
                   className="block w-full rounded-md border-0 py-1.5 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
+                {errors.city && <p className="text-red-600">{errors.city}</p>}
               </div>
             </div>
 
@@ -245,6 +246,7 @@ export default function Application() {
                   onChange={handleChange}
                   className="block w-full rounded-md border-0 py-1.5 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
+                {errors.region && <p className="text-red-600">{errors.region}</p>}
               </div>
             </div>
 
@@ -262,6 +264,7 @@ export default function Application() {
                   onChange={handleChange}
                   className="block w-full rounded-md border-0 py-1.5 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
+                {errors.postalCode && <p className="text-red-600">{errors.postalCode}</p>}
               </div>
             </div>
           </div>
@@ -276,12 +279,16 @@ export default function Application() {
             onDrop={(e) => {
               e.preventDefault();
               const file = e.dataTransfer.files[0];
-              if (file && file.type === "application/pdf" && file.size <= 5 * 1024 * 1024) {
-                setFormData({ ...formData, resume: file });
-                setResumeFileName(file.name);
-                setErrors({ ...errors, resume: "" });
-              } else {
-                setErrors({ ...errors, resume: "Only PDF files up to 5MB are allowed" });
+              if (file) {
+                if (file.type !== "application/pdf") {
+                  setErrors({ ...errors, resume: "Only PDF files are allowed" });
+                } else if (file.size > 5 * 1024 * 1024) { // 5MB in bytes
+                  setErrors({ ...errors, resume: "File size must be less than 5MB" });
+                } else {
+                  setFormData({ ...formData, resume: file });
+                  setResumeFileName(file.name);
+                  setErrors({ ...errors, resume: "" });
+                }
               }
             }}
           >
@@ -315,7 +322,7 @@ export default function Application() {
       <div className="mt-6 flex items-center justify-end gap-x-6">
         <button
           type="button"
-          className="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          className="text-sm font-semibold leading-6 text-gray-900"
           onClick={handleCancel}
         >
           Cancel
